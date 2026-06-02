@@ -1,5 +1,3 @@
 <Solution>
-  <Project Path="../ConsumerApp/ConsumerApp.csproj" />
-  <Project Path="../ConsumerClient/ConsumerClient.csproj" Id="3863c044-0903-478e-a1c5-921d80202663" />
   <Project Path="WinFormsApp1.csproj" />
 </Solution>

@@ -1,17 +1,22 @@
+using ConsumerClient;
+
 namespace WinFormsApp1
 {
     internal static class Program
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+
+            var sendForm = new Form1();
+
+            var receiveForm =
+                new ConsumerClient.Form1();
+
+            receiveForm.Show();
+
+            Application.Run(sendForm);
         }
     }
 }

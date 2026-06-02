@@ -59,6 +59,7 @@
             txtBootstrapServer.Size = new Size(158, 23);
             txtBootstrapServer.TabIndex = 0;
             txtBootstrapServer.Text = "localhost:9092";
+            txtBootstrapServer.TextChanged += txtBootstrapServer_TextChanged;
             // 
             // txtTopic
             // 

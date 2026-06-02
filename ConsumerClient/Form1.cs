@@ -2,6 +2,8 @@ using Confluent.Kafka;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Text.Json;
+using ConsumerClient.Repositories;
+using ConsumerClient;
 
 namespace ConsumerClient
 {
@@ -14,6 +16,8 @@ namespace ConsumerClient
 
         private readonly string _connectionString =
             "Server=localhost;Database=KafkaTest;Trusted_Connection=True;TrustServerCertificate=True;";
+        private readonly MessageRepository _repository;
+
         private void AddLog(string message)
         {
             if (InvokeRequired)
@@ -29,6 +33,10 @@ namespace ConsumerClient
         public Form1()
         {
             InitializeComponent();
+
+            _repository =
+                 new MessageRepository(
+                    _connectionString);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -64,7 +72,7 @@ namespace ConsumerClient
                 GroupId = txtGroupId.Text,
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
-            
+
             _consumer =
                 new ConsumerBuilder<Ignore, string>(config)
                 .Build();
@@ -74,58 +82,7 @@ namespace ConsumerClient
             AddLog("Consumer 시작");
             StartConsumerLoop();
         }
-        private void SaveToDatabase(
-    NotificationMessage notification,
-    string topic)
-        {
-            using SqlConnection connection =
-                new SqlConnection(_connectionString);
-
-            connection.Open();
-
-            string sql =
-            @"INSERT INTO KafkaMessageSample
-      (
-          UserId,
-          Title,
-          MessageBody,
-          KafkaTopic,
-          SendDateTime
-      )
-      VALUES
-      (
-          @UserId,
-          @Title,
-          @MessageBody,
-          @KafkaTopic,
-          @SendDateTime
-      )";
-
-            using SqlCommand command =
-                new SqlCommand(sql, connection);
-
-            command.Parameters.AddWithValue(
-                "@UserId",
-                notification.UserId);
-
-            command.Parameters.AddWithValue(
-                "@Title",
-                notification.Title);
-
-            command.Parameters.AddWithValue(
-                "@MessageBody",
-                notification.MessageBody);
-
-            command.Parameters.AddWithValue(
-                "@KafkaTopic",
-                topic);
-
-            command.Parameters.AddWithValue(
-                 "@SendDateTime",
-                 notification.SendDateTime);
-
-            command.ExecuteNonQuery();
-        }
+       
         private void StartConsumerLoop()
         {
             Task.Run(() =>
@@ -134,23 +91,23 @@ namespace ConsumerClient
                {
                    while (!_cts!.IsCancellationRequested)
                    {
-                       
+
                        var result = _consumer!.Consume(_cts.Token);
 
                        var notification =
                         JsonSerializer.Deserialize<NotificationMessage>(
                             result.Message.Value);
 
-                        AddLog(
-                            $"{notification!.UserId} - {notification.Title}");
-                    
-                       SaveToDatabase(notification, result.Topic);
+                       AddLog(
+                           $"{notification!.UserId} - {notification.Title}");
+
+                       _repository.SaveMessage(notification,result.Topic);
                    }
                }
 
                catch (OperationCanceledException)
                {
-                   
+
                }
 
                catch (ConsumeException ex)
@@ -167,14 +124,14 @@ namespace ConsumerClient
 
                catch (SqlException ex)
                {
-                       AddLog(
-                           $"DB 오류 : {ex.Message}");
+                   AddLog(
+                       $"DB 오류 : {ex.Message}");
                }
 
                catch (Exception ex)
                {
-                       AddLog(
-                           $"기타 오류 : {ex.Message}");
+                   AddLog(
+                       $"기타 오류 : {ex.Message}");
                }
 
 
@@ -200,73 +157,20 @@ namespace ConsumerClient
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            using SqlConnection connection =
-                new SqlConnection(_connectionString);
-
-            connection.Open();
-
-            string sql =
-            @"SELECT *
-      FROM KafkaMessageSample
-      WHERE 1 = 1";
-
-            SqlCommand command =
-                new SqlCommand();
-
-            command.Connection = connection;
-
-            // 사용자 ID 조건
-            if (!string.IsNullOrWhiteSpace(txtSearchUserId.Text))
-            {
-                sql += " AND UserId = @UserId";
-
-                command.Parameters.AddWithValue(
-                    "@UserId",
-                    txtSearchUserId.Text);
-            }
-
-            // 기간 조건
-            sql += @" AND ReceivedAt >= @StartDate
-              AND ReceivedAt < @EndDate";
-
-            command.Parameters.AddWithValue(
-                "@StartDate",
-                dtpStartDate.Value.Date);
-
-            command.Parameters.AddWithValue(
-                "@EndDate",
-                dtpEndDate.Value.Date.AddDays(1));
-
-            // 검색어 조건
-            if (!string.IsNullOrWhiteSpace(txtKeyword.Text))
-            {
-                sql += @" AND
-                 (
-                    Title LIKE @Keyword
-                    OR MessageBody LIKE @Keyword
-                 )";
-
-                command.Parameters.AddWithValue(
-                    "@Keyword",
-                    "%" + txtKeyword.Text + "%");
-            }
-
-            sql += " ORDER BY Id DESC";
-
-            command.CommandText = sql;
-
-            SqlDataAdapter adapter =
-                new SqlDataAdapter(command);
-
-            DataTable table =
-                new DataTable();
-
-            adapter.Fill(table);
-
-            dgvMessages.DataSource = table;
+            dgvMessages.DataSource =
+                _repository.GetMessages(
+                    txtSearchUserId.Text,
+                    dtpStartDate.Value,
+                    dtpEndDate.Value,
+                    txtKeyword.Text);
         }
 
         private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtBootstrapServer_TextChanged(object sender, EventArgs e)
         {
 
         }
