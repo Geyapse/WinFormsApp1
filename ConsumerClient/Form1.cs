@@ -4,6 +4,7 @@ using System.Data;
 using System.Text.Json;
 using ConsumerClient.Repositories;
 using ConsumerClient;
+using ConsumerClient.Services;
 
 namespace ConsumerClient
 {
@@ -17,6 +18,7 @@ namespace ConsumerClient
         private readonly string _connectionString =
             "Server=localhost;Database=KafkaTest;Trusted_Connection=True;TrustServerCertificate=True;";
         private readonly MessageRepository _repository;
+        private readonly MessageService _service;
 
         private void AddLog(string message)
         {
@@ -37,6 +39,9 @@ namespace ConsumerClient
             _repository =
                  new MessageRepository(
                     _connectionString);
+            _service =
+                 new MessageService(
+                     _repository);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -82,7 +87,7 @@ namespace ConsumerClient
             AddLog("Consumer 시작");
             StartConsumerLoop();
         }
-       
+
         private void StartConsumerLoop()
         {
             Task.Run(() =>
@@ -101,7 +106,7 @@ namespace ConsumerClient
                        AddLog(
                            $"{notification!.UserId} - {notification.Title}");
 
-                       _repository.SaveMessage(notification,result.Topic);
+                       _service.SaveMessage(notification, result.Topic);
                    }
                }
 
@@ -158,7 +163,7 @@ namespace ConsumerClient
         private void btnLoad_Click(object sender, EventArgs e)
         {
             dgvMessages.DataSource =
-                _repository.GetMessages(
+                _service.GetMessages(
                     txtSearchUserId.Text,
                     dtpStartDate.Value,
                     dtpEndDate.Value,
