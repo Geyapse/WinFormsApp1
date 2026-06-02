@@ -5,6 +5,7 @@ using System.Text.Json;
 using ConsumerClient.Repositories;
 using ConsumerClient;
 using ConsumerClient.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace ConsumerClient
 {
@@ -15,8 +16,7 @@ namespace ConsumerClient
         private IConsumer<Ignore, string>? _consumer;
 
 
-        private readonly string _connectionString =
-            "Server=localhost;Database=KafkaTest;Trusted_Connection=True;TrustServerCertificate=True;";
+        private readonly string _connectionString;
         private readonly MessageRepository _repository;
         private readonly MessageService _service;
 
@@ -35,6 +35,30 @@ namespace ConsumerClient
         public Form1()
         {
             InitializeComponent();
+
+            IConfiguration config =
+      new ConfigurationBuilder()
+      .SetBasePath(
+          AppDomain.CurrentDomain.BaseDirectory)
+      .AddJsonFile(
+          "appsettings.json",
+          optional: false,
+          reloadOnChange: true)
+      .Build();
+
+            _connectionString =
+                 config.GetConnectionString(
+                    "DefaultConnection")!;
+
+            txtBootstrapServer.Text =
+                config["Kafka:BootstrapServers"];
+
+            txtTopic.Text =
+                config["Kafka:Topic"];
+
+            txtGroupId.Text =
+                config["Kafka:GroupId"];
+
 
             _repository =
                  new MessageRepository(
