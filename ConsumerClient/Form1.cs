@@ -1,11 +1,10 @@
 using Confluent.Kafka;
 using Microsoft.Data.SqlClient;
-using System.Data;
 using System.Text.Json;
 using ConsumerClient.Repositories;
-using ConsumerClient;
 using ConsumerClient.Services;
 using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace ConsumerClient
 {
@@ -28,8 +27,19 @@ namespace ConsumerClient
                 return;
             }
 
-            lstMessages.Items.Add(
-                $"[{DateTime.Now:HH:mm:ss}] {message}");
+            string logMessage =
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}";
+
+            lstMessages.Items.Add(logMessage);
+
+            Directory.CreateDirectory("logs");
+
+            string fileName =
+                $"logs\\{DateTime.Now:yyyy-MM-dd}.log";
+
+            File.AppendAllText(
+                fileName,
+                logMessage + Environment.NewLine);
         }
 
         public Form1()
