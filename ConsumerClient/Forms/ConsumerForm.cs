@@ -1,14 +1,15 @@
 using Confluent.Kafka;
 using Microsoft.Data.SqlClient;
 using System.Text.Json;
-using ConsumerClient.Repositories;
-using ConsumerClient.Services;
+using WinFormsApp1.ConsumerClient.Repositories;
+using WinFormsApp1.ConsumerClient.Services;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using WinFormsApp1.ConsumerClient.Models;
 
-namespace ConsumerClient
+namespace WinFormsApp1.ConsumerClient
 {
-    public partial class Form1 : Form
+    public partial class ConsumerForm : Form
     {
         private CancellationTokenSource? _cts;
 
@@ -42,7 +43,7 @@ namespace ConsumerClient
                 logMessage + Environment.NewLine);
         }
 
-        public Form1()
+        public ConsumerForm()
         {
             InitializeComponent();
 

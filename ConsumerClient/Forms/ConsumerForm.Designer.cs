@@ -1,6 +1,6 @@
-﻿namespace ConsumerClient
+﻿namespace WinFormsApp1.ConsumerClient
 {
-    partial class Form1
+    partial class ConsumerForm
     {
         /// <summary>
         ///  Required designer variable.

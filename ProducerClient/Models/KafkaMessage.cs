@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WinFormsApp1
+namespace WinFormsApp1.ProducerClient.Models
 {
     internal class KafkaMessage
     {

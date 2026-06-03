@@ -1,4 +1,4 @@
-using ConsumerClient;
+using WinFormsApp1.ConsumerClient;
 
 namespace WinFormsApp1
 {
@@ -9,10 +9,10 @@ namespace WinFormsApp1
         {
             ApplicationConfiguration.Initialize();
 
-            var sendForm = new Form1();
+            var sendForm = new ProducerForm();
 
             var receiveForm =
-                new ConsumerClient.Form1();
+                new ConsumerClient.ConsumerForm();
 
             receiveForm.Show();
 

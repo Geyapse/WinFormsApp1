@@ -1,7 +1,8 @@
 ﻿using System.Data;
-using ConsumerClient.Repositories;
+using WinFormsApp1.ConsumerClient.Repositories;
+using WinFormsApp1.ConsumerClient.Models;
 
-namespace ConsumerClient.Services;
+namespace WinFormsApp1.ConsumerClient.Services;
 
 public class MessageService
 {

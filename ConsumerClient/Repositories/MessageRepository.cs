@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data;
-using ConsumerClient;
-namespace ConsumerClient.Repositories;
+using WinFormsApp1.ConsumerClient.Models;
+namespace WinFormsApp1.ConsumerClient.Repositories;
 
 public class MessageRepository
 {

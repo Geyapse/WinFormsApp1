@@ -1,11 +1,12 @@
 using System.Text.Json;
 using Confluent.Kafka;
+using WinFormsApp1.ProducerClient.Models;
 
 namespace WinFormsApp1
 {
-    public partial class Form1 : Form
+    public partial class ProducerForm : Form
     {
-        public Form1()
+        public ProducerForm()
         {
             InitializeComponent();
         }
