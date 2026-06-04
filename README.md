@@ -61,24 +61,35 @@ DataGridView 조회
 ```text
 WinFormsApp1
 │
-├─ ConsumerApp
+├─ ProducerClient
+│   ├─ Forms
+│   │   └─ ProducerForm.cs
+│   │
+│   ├─ Models
+│   │   └─ KafkaMessage.cs
+│   │
+│   └─ Services
+│       └─ KafkaProducerService.cs
 │
 ├─ ConsumerClient
-│   ├─ Repositories
-│   │   └─ MessageRepository.cs
+│   ├─ Forms
+│   │   └─ ConsumerForm.cs
+│   │
+│   ├─ Models
+│   │   └─ NotificationMessage.cs
 │   │
 │   ├─ Services
 │   │   └─ MessageService.cs
 │   │
-│   ├─ NotificationMessage.cs
-│   └─ Form1.cs
+│   └─ Repositories
+│       └─ MessageRepository.cs
 │
 ├─ Database
 │   └─ CreateTable.sql
 │
 ├─ appsettings.json
-│
-└─ Program.cs
+├─ Program.cs
+└─ README.md
 ```
 
 ---
@@ -102,7 +113,7 @@ WinFormsApp1
 ## Producer Client
 
 * Kafka 메시지 전송
-* Kafka Server 설정
+* Kafka 서버 설정
 * Topic 설정
 * JSON 직렬화
 * 전송 성공 / 실패 로그 출력
@@ -135,10 +146,18 @@ WinFormsApp1
 
 # 아키텍처
 
-Consumer는 Service 계층과 Repository 계층을 분리하여 구현하였습니다.
+```text
+ProducerForm
+      │
+      ▼
+KafkaProducerService
+      │
+      ▼
+Kafka
+```
 
 ```text
-WinForms UI
+ConsumerForm
       │
       ▼
 MessageService
@@ -149,25 +168,6 @@ MessageRepository
       ▼
 MSSQL
 ```
-
-역할
-
-### Form1
-
-* 화면 처리
-* 사용자 입력 처리
-* 이벤트 처리
-
-### MessageService
-
-* 비즈니스 로직 처리
-* UI와 Repository 연결
-
-### MessageRepository
-
-* MSSQL 저장
-* MSSQL 조회
-* SQL 관리
 
 ---
 
@@ -265,20 +265,29 @@ CreateTable.sql 실행
 데이터베이스 생성
 
 ```sql
-KafkaTest
+CREATE DATABASE KafkaTest;
 ```
 
 테이블 생성
 
 ```sql
-KafkaMessageSample
+CREATE TABLE KafkaMessageSample
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId NVARCHAR(50),
+    Title NVARCHAR(200),
+    MessageBody NVARCHAR(MAX),
+    KafkaTopic NVARCHAR(100),
+    SendDateTime DATETIME,
+    ReceivedAt DATETIME DEFAULT GETDATE()
+);
 ```
 
 ---
 
 ## 4. Consumer 실행
 
-ConsumerClient 실행
+ConsumerForm 실행
 
 설정값 확인
 
@@ -294,7 +303,7 @@ GroupId : notification-consumer
 
 ## 5. Producer 실행
 
-ConsumerApp 실행
+ProducerForm 실행
 
 메시지 입력
 
@@ -315,21 +324,6 @@ Consumer 로그 확인
 MSSQL 저장 확인
 
 DataGridView 조회 확인
-
----
-
-# 예외 처리
-
-구현 항목
-
-* Kafka 서버 연결 실패
-* Kafka Consumer 오류
-* Topic 오류
-* JSON 역직렬화 오류
-* MSSQL 연결 오류
-* DB INSERT 오류
-* DB SELECT 오류
-* 일반 예외 처리
 
 ---
 
@@ -354,6 +348,22 @@ logs
 
 ---
 
+# 예외 처리
+
+구현 항목
+
+* Kafka 서버 연결 실패
+* Kafka Consumer 오류
+* Topic 오류
+* JSON 역직렬화 오류
+* MSSQL 연결 오류
+* DB INSERT 오류
+* DB SELECT 오류
+* 일반 예외 처리
+* Consumer 정상 종료 처리
+
+---
+
 # 주요 특징
 
 * Kafka Producer / Consumer 구조 구현
@@ -365,17 +375,29 @@ logs
 * appsettings.json 기반 설정 관리
 * 로그 파일 저장 기능 구현
 * 예외 처리 적용
+* Consumer 안전 종료 처리
 
 ---
 
-# 향후 개선 사항
+# 실행 결과
 
-* Producer Service 계층 분리
-* 페이징 처리
-* Docker 환경 구성
-* Kafka Dead Letter Queue 적용
-* 설정값 암호화
-* ELK 기반 로그 수집
+## Producer 화면
 
-```
-```
+<img width="563" height="544" alt="image" src="https://github.com/user-attachments/assets/cddf4b98-d701-4ed8-afda-186e59b4edbc" />
+
+
+## Consumer 화면
+
+<img width="719" height="567" alt="image" src="https://github.com/user-attachments/assets/d911d6dc-9228-4bbe-ae45-7ba83ed7d2f2" />
+
+
+## MSSQL 저장 결과
+
+<img width="817" height="778" alt="image" src="https://github.com/user-attachments/assets/e1f45605-8d38-45b4-b6b3-5b7def4661ea" />
+
+
+## 로그 파일
+<img width="1003" height="735" alt="image" src="https://github.com/user-attachments/assets/19a017cb-adff-4737-93f7-ffbf347890ca" />
+
+
+
