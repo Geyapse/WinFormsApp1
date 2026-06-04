@@ -1,4 +1,4 @@
-﻿namespace WinFormsApp1
+﻿namespace WinFormsApp1.ProducerClient.Forms
 {
     partial class ProducerForm
     {

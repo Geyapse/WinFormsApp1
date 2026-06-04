@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WinFormsApp1.ProducerClient.Models
 {
-    internal class KafkaMessage
+    public class KafkaMessage
     {
         public string UserId { get; set; } = string.Empty;
 

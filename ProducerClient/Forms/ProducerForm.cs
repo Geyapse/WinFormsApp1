@@ -1,14 +1,16 @@
 using System.Text.Json;
-using Confluent.Kafka;
 using WinFormsApp1.ProducerClient.Models;
+using WinFormsApp1.ProducerClient.Services;
 
-namespace WinFormsApp1
+namespace WinFormsApp1.ProducerClient.Forms
 {
     public partial class ProducerForm : Form
     {
+        private readonly KafkaProducerService _producerService;
         public ProducerForm()
         {
             InitializeComponent();
+            _producerService = new KafkaProducerService();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -54,26 +56,14 @@ namespace WinFormsApp1
 
                 string json = JsonSerializer.Serialize(message);
 
-                var config = new ProducerConfig
-                {
-                    BootstrapServers = "localhost:9092"
-                };
-
-                using var producer =
-                    new ProducerBuilder<Null, string>(config).Build();
-
-                var result = await producer.ProduceAsync(
-                    "winform-sample-topic",
-                    new Message<Null, string>
-                    {
-                        Value = json
-                    });
+                string result =
+                await _producerService.SendAsync(
+                   message,
+                   "localhost:9092",
+                   "winform-sample-topic");
 
                 txtLog.AppendText(
-                    $"전송 성공 : {result.TopicPartitionOffset}\r\n");
-
-                txtLog.AppendText(
-                    $"{json}\r\n\r\n");
+                    $"전송 성공 : {result}\r\n\r\n");
             }
             catch (Exception ex)
             {
