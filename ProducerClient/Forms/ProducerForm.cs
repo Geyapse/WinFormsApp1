@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using WinFormsApp1.ProducerClient.Models;
 using WinFormsApp1.ProducerClient.Services;
@@ -7,10 +8,30 @@ namespace WinFormsApp1.ProducerClient.Forms
     public partial class ProducerForm : Form
     {
         private readonly KafkaProducerService _producerService;
+        private readonly string _bootstrapServers;
+        private readonly string _topic;
         public ProducerForm()
         {
             InitializeComponent();
-            _producerService = new KafkaProducerService();
+
+            _producerService =
+                new KafkaProducerService();
+
+            IConfiguration config =
+                new ConfigurationBuilder()
+                    .SetBasePath(
+                        AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile(
+                        "appsettings.json",
+                        optional: false,
+                        reloadOnChange: true)
+                    .Build();
+
+            _bootstrapServers =
+                config["Kafka:BootstrapServers"]!;
+
+            _topic =
+                config["Kafka:Topic"]!;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -58,9 +79,9 @@ namespace WinFormsApp1.ProducerClient.Forms
 
                 string result =
                 await _producerService.SendAsync(
-                   message,
-                   "localhost:9092",
-                   "winform-sample-topic");
+                 message,
+                "localhost:9092",
+                "winform-sample-topic");
 
                 txtLog.AppendText(
                     $"전송 성공 : {result}\r\n\r\n");
