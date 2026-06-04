@@ -18,7 +18,11 @@ public class KafkaProducerService
         new ProducerConfig
         {
             BootstrapServers =
-                bootstrapServers
+                bootstrapServers,
+
+                MessageTimeoutMs = 3000,
+
+            SocketTimeoutMs = 3000
         };
 
         using var producer =

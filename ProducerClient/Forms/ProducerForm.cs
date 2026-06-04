@@ -79,9 +79,9 @@ namespace WinFormsApp1.ProducerClient.Forms
 
                 string result =
                 await _producerService.SendAsync(
-                 message,
-                "localhost:9092",
-                "winform-sample-topic");
+                message,
+                txtKafkaServer.Text,
+                txtTopic.Text);
 
                 txtLog.AppendText(
                     $"전송 성공 : {result}\r\n\r\n");
@@ -89,7 +89,10 @@ namespace WinFormsApp1.ProducerClient.Forms
             catch (Exception ex)
             {
                 txtLog.AppendText(
-                    $"오류 : {ex.Message}\r\n");
+                    $"오류 타입 : {ex.GetType().Name}\r\n");
+
+                txtLog.AppendText(
+                    $"오류 내용 : {ex.Message}\r\n\r\n");
             }
         }
 

@@ -82,8 +82,6 @@ namespace WinFormsApp1.ConsumerClient
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             _cts?.Cancel();
-            _consumer?.Close();
-            _consumer?.Dispose();
 
             base.OnFormClosing(e);
         }
